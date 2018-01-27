@@ -50,7 +50,6 @@ void printRegister(int r) {
     // Clear existing data
     moveCursor((r/2)+1, 40);
     // Clear left if even, right if odd.
-    usbprintf(r%2?CLEAR_LEFT:CLEAR_RIGHT);
     // Move to correct position
     moveCursor((r/2)+1, ((r%2)*40)+1);
     usbprintf("%.3x: ",registersFound[r].addr);
