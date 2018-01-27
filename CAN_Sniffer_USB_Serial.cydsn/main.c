@@ -89,6 +89,38 @@ void screenBlank() {
     }
 }
 
+void swap(uint16 *xp, uint16 *yp)
+{
+    uint16 temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+void bubbleSort(uint16 arr[], uint16 n)
+{
+   uint16 i, j;
+   for (i = 0; i < n-1; i++)
+
+       // Last i elements are already in place
+       for (j = 0; j < n-i-1; j++)
+           if (arr[j] > arr[j+1])
+              swap(&arr[j], &arr[j+1]);
+}
+
+void sortRegisters() {
+    int i;
+    uint16 sortReg[MAX_REGISTERS];
+    for(i=0;i<MAX_REGISTERS; i++) {
+        sortReg[i] = registersFound[i].addr;
+    }
+    bubbleSort(sortReg, MAX_REGISTERS);
+    for(i=0;i<MAX_REGISTERS; i++) {
+        registersFound[i].addr = sortReg[i];
+        registersFound[i].len = 0; // Reset length so nothing gets printed until this is refreshed
+        registersFound[i].printed = false;
+    }
+}
+
 void printAllRegisters() {
     int i;
     for(i=0;i<MAX_REGISTERS; i++) {
@@ -156,6 +188,13 @@ int main()
                 {
                     CAN_RX_INT_DISABLE(0);
                     clearRegisters();
+                    CAN_RX_INT_ENABLE(0);
+                }
+                // "S" sorts the registers
+                if((rxData[0] == 's') || (rxData[0] == 'S'))
+                {
+                    CAN_RX_INT_DISABLE(0);
+                    sortRegisters();
                     CAN_RX_INT_ENABLE(0);
                 }
                 // Any other keystroke redraws the screen in case of a problem.
